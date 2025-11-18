@@ -17,12 +17,18 @@ namespace Escalonadores.Model
         public long idPaciente { get; set; }
 
         [Column("contador_medico")]
-        public long contador_medico { get; set; }
+        public long? contador_medico { get; set; }
 
         [Column("inicio")]
-        public long inicio { get; set; }
+        public bool inicio { get; set; }
 
         [Column("fim")]
-        public long fim { get; set; }
+        public bool fim { get; set; }
+
+        [Column("espera")]
+        public bool espera { get; set; }
+
+        [Column("momento")]
+        public long momento { get; set; }
     }
 }
