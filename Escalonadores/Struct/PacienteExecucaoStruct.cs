@@ -24,9 +24,20 @@ namespace Escalonadores.Struct
 
         public long? quantum { get; set; }
 
+        public bool emAtendimento { get; set; }
+
+        public long tempoEspera { get; set; }
+
+        public long? contadorMedico { get; set; }
+
         public long inicio { get; set; }
 
         public long fim { get; set; }
-        public bool executado { get; set; }
+
+        public long duracaoTotal { get; set; }
+
+        public long nAtendimentos { get; set; }
+
+        public bool preemptado { get; set; }
     }
 }

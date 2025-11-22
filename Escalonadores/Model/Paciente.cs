@@ -19,8 +19,14 @@ namespace Escalonadores.Model
         [Column("tempo_saida")]
         public long tempoSaida { get; set; }
 
+        [Column("tempo_espera")]
+        public long tempoEspera { get; set; }
+
         [Column("duracao")]
         public long duracao { get; set; }
+
+        [Column("duracao_total")]
+        public long duracaoTotal { get; set; }
 
         [Column("id_prioridade_manchester")]
         public long idPrioridadeManchester { get; set; }

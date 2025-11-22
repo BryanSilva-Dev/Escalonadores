@@ -24,5 +24,12 @@ namespace Escalonadores.Repository
             _context.SaveChanges();
             return listPacientes;
         }
+
+        public List<Paciente> UpdateRange(List<Paciente> listPacientes)
+        {
+            _context.UpdateRange(listPacientes);
+            _context.SaveChanges();
+            return listPacientes;
+        }
     }
 }

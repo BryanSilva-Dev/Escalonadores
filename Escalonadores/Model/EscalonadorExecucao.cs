@@ -14,7 +14,7 @@ namespace Escalonadores.Model
         public long idExecucao { get; set; }
 
         [Column("id_paciente")]
-        public long idPaciente { get; set; }
+        public long? idPaciente { get; set; }
 
         [Column("contador_medico")]
         public long? contador_medico { get; set; }
