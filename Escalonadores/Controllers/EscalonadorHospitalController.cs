@@ -17,6 +17,25 @@ namespace Escalonadores.Controllers
 
         }
 
+        [HttpGet("Lookups/")]
+        public IActionResult Get()
+        {
+            LookupResponse response = new LookupResponse();
+            try
+            {
+                response.listEscalonador = _escalonadorRepository.GetAll();
+                response.listPrioridades = _prioridadeManchesterRepository.GetAll();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.isError = true;
+                response.errorDescription = ex.Message;
+                return Ok(response);
+            }
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody] EscalonadorHospitalRequest request)
         {
