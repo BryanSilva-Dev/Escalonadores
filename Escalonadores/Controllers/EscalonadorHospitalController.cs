@@ -211,6 +211,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
+                                pacientesAtendidos = pacientesAtendidos + 1;
 
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
@@ -359,6 +360,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
+                                pacientesAtendidos = pacientesAtendidos + 1;
 
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
@@ -536,7 +538,7 @@ namespace Escalonadores.Controllers
                                     pacAtendidos.Add(pac);
 
                                     nMedicosDisponiveis = nMedicosDisponiveis + 1;
-
+                                    pacientesAtendidos = pacientesAtendidos + 1;
                                     EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                     escalonadorExecucao.idExecucao = pac.idExecucao;
                                     escalonadorExecucao.idPaciente = pac.idPaciente;
@@ -687,7 +689,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
-
+                                pacientesAtendidos = pacientesAtendidos + 1;
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
                                 escalonadorExecucao.idPaciente = pac.idPaciente;
@@ -758,11 +760,9 @@ namespace Escalonadores.Controllers
 
                 long totalAtendimento = pacAtendidos.Select(x => x.duracaoTotal).ToList().Sum();
 
-                execucao.mediaEspera = totalExecucoes / totalEspera;
-
-                execucao.mediaExecucao = totalAtendimento / totalPacientes;
-
-                execucao.mediaCPU = cpuTotal / totalExecucoes;
+                execucao.mediaEspera = (totalEspera == 0) ? 0 : (double)totalExecucoes / totalEspera;
+                execucao.mediaExecucao = (totalPacientes == 0) ? 0 : (double)totalAtendimento / totalPacientes;
+                execucao.mediaCPU = (totalExecucoes == 0) ? 0 : (double)cpuTotal / totalExecucoes;
 
                 _execucaoRepository.Update(execucao);
 
