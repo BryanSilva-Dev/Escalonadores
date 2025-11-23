@@ -178,6 +178,8 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao > 0 && pac.quantum == 0)
@@ -197,6 +199,8 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = true;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao == 0)
@@ -346,6 +350,8 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao == 0)
@@ -524,6 +530,8 @@ namespace Escalonadores.Controllers
                                     escalonadorExecucao.fim = false;
                                     escalonadorExecucao.espera = false;
                                     escalonadorExecucao.momento = momento;
+
+                                    eventos.Add(escalonadorExecucao);
                                 }
 
                                 else if (pac.emAtendimento && pac.duracao == 0)
@@ -620,7 +628,7 @@ namespace Escalonadores.Controllers
 
                         else
                         {
-                            pacChegada = pacChegada.OrderByDescending(x => x.duracao).ToList();
+                            pacChegada = pacChegada.OrderBy(x => x.duracao).ToList();
                         }
 
                         foreach(var pac in pacChegada)
@@ -675,6 +683,7 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if(pac.emAtendimento && pac.duracao == 0)
@@ -756,13 +765,15 @@ namespace Escalonadores.Controllers
 
                 long totalEspera = eventos.Where(x => x.espera).Count();
 
-                long cpuTotal = eventos.Where(x => x.inicio || x.fim || x.contador_medico != null).Count();
+                long cpuTotal = eventos.Where(x => (x.inicio || x.fim || x.contador_medico != null) && !x.espera).Select(x => x.momento).Distinct().Count();
+
+                long momentos = eventos.Select(x => x.momento).Distinct().Count();
 
                 long totalAtendimento = pacAtendidos.Select(x => x.duracaoTotal).ToList().Sum();
 
                 execucao.mediaEspera = (totalEspera == 0) ? 0 : (double)totalExecucoes / totalEspera;
-                execucao.mediaExecucao = (totalPacientes == 0) ? 0 : (double)totalAtendimento / totalPacientes;
-                execucao.mediaCPU = (totalExecucoes == 0) ? 0 : (double)cpuTotal / totalExecucoes;
+                execucao.mediaExecucao = (totalExecucoes == 0) ? 0 : (double)totalAtendimento / totalExecucoes;
+                execucao.mediaCPU = (cpuTotal == 0) ? 0 : (double)momentos / cpuTotal;
 
                 _execucaoRepository.Update(execucao);
 
