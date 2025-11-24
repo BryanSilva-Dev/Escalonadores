@@ -103,6 +103,7 @@ namespace Escalonadores.Controllers
                     fim = 0,
                     duracaoTotal = 0,
                     nAtendimentos = 0,
+                    quantumOriginal = p.quantum,
                 }).ToList();
 
                 if (request.idAlgoritmo == (long)EscalonadorEnum.RoundRobin)
@@ -185,7 +186,7 @@ namespace Escalonadores.Controllers
                             else if (pac.emAtendimento && pac.duracao > 0 && pac.quantum == 0)
                             {
                                 pac.emAtendimento = false;
-                                pac.quantum = pacSimulacao.Where(x => x.idPaciente == pac.idPaciente).Select(x => x.quantum).FirstOrDefault();
+                                pac.quantum = pac.quantumOriginal;
                                 pac.tempoEspera = pac.tempoEspera + 1;
                                 pac.contadorMedico = null;
 
