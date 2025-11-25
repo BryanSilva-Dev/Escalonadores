@@ -71,25 +71,33 @@ namespace Escalonadores.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("idEscalonadorExecucao"));
 
-                    b.Property<long>("contador_medico")
+                    b.Property<long?>("contador_medico")
                         .HasColumnType("bigint")
                         .HasColumnName("contador_medico");
 
-                    b.Property<long>("fim")
-                        .HasColumnType("bigint")
+                    b.Property<bool>("espera")
+                        .HasColumnType("boolean")
+                        .HasColumnName("espera");
+
+                    b.Property<bool>("fim")
+                        .HasColumnType("boolean")
                         .HasColumnName("fim");
 
                     b.Property<long>("idExecucao")
                         .HasColumnType("bigint")
                         .HasColumnName("id_execucao");
 
-                    b.Property<long>("idPaciente")
+                    b.Property<long?>("idPaciente")
                         .HasColumnType("bigint")
                         .HasColumnName("id_paciente");
 
-                    b.Property<long>("inicio")
-                        .HasColumnType("bigint")
+                    b.Property<bool>("inicio")
+                        .HasColumnType("boolean")
                         .HasColumnName("inicio");
+
+                    b.Property<long>("momento")
+                        .HasColumnType("bigint")
+                        .HasColumnName("momento");
 
                     b.HasKey("idEscalonadorExecucao");
 
@@ -151,6 +159,10 @@ namespace Escalonadores.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("duracao");
 
+                    b.Property<long>("duracaoTotal")
+                        .HasColumnType("bigint")
+                        .HasColumnName("duracao_total");
+
                     b.Property<long>("idExecucao")
                         .HasColumnType("bigint")
                         .HasColumnName("id_execucao");
@@ -166,6 +178,10 @@ namespace Escalonadores.Migrations
                     b.Property<long>("tempoChegada")
                         .HasColumnType("bigint")
                         .HasColumnName("tempo_chegada");
+
+                    b.Property<long>("tempoEspera")
+                        .HasColumnType("bigint")
+                        .HasColumnName("tempo_espera");
 
                     b.Property<long>("tempoSaida")
                         .HasColumnType("bigint")

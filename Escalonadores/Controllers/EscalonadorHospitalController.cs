@@ -17,6 +17,25 @@ namespace Escalonadores.Controllers
 
         }
 
+        [HttpGet("Lookups/")]
+        public IActionResult Get()
+        {
+            LookupResponse response = new LookupResponse();
+            try
+            {
+                response.listEscalonador = _escalonadorRepository.GetAll();
+                response.listPrioridades = _prioridadeManchesterRepository.GetAll();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.isError = true;
+                response.errorDescription = ex.Message;
+                return Ok(response);
+            }
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody] EscalonadorHospitalRequest request)
         {
@@ -84,6 +103,7 @@ namespace Escalonadores.Controllers
                     fim = 0,
                     duracaoTotal = 0,
                     nAtendimentos = 0,
+                    quantumOriginal = p.quantum,
                 }).ToList();
 
                 if (request.idAlgoritmo == (long)EscalonadorEnum.RoundRobin)
@@ -159,12 +179,14 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao > 0 && pac.quantum == 0)
                             {
                                 pac.emAtendimento = false;
-                                pac.quantum = pacSimulacao.Where(x => x.idPaciente == pac.idPaciente).Select(x => x.quantum).FirstOrDefault();
+                                pac.quantum = pac.quantumOriginal;
                                 pac.tempoEspera = pac.tempoEspera + 1;
                                 pac.contadorMedico = null;
 
@@ -178,6 +200,8 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = true;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao == 0)
@@ -192,6 +216,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
+                                pacientesAtendidos = pacientesAtendidos + 1;
 
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
@@ -326,6 +351,8 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if (pac.emAtendimento && pac.duracao == 0)
@@ -340,6 +367,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
+                                pacientesAtendidos = pacientesAtendidos + 1;
 
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
@@ -503,6 +531,8 @@ namespace Escalonadores.Controllers
                                     escalonadorExecucao.fim = false;
                                     escalonadorExecucao.espera = false;
                                     escalonadorExecucao.momento = momento;
+
+                                    eventos.Add(escalonadorExecucao);
                                 }
 
                                 else if (pac.emAtendimento && pac.duracao == 0)
@@ -517,7 +547,7 @@ namespace Escalonadores.Controllers
                                     pacAtendidos.Add(pac);
 
                                     nMedicosDisponiveis = nMedicosDisponiveis + 1;
-
+                                    pacientesAtendidos = pacientesAtendidos + 1;
                                     EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                     escalonadorExecucao.idExecucao = pac.idExecucao;
                                     escalonadorExecucao.idPaciente = pac.idPaciente;
@@ -599,7 +629,7 @@ namespace Escalonadores.Controllers
 
                         else
                         {
-                            pacChegada = pacChegada.OrderByDescending(x => x.duracao).ToList();
+                            pacChegada = pacChegada.OrderBy(x => x.duracao).ToList();
                         }
 
                         foreach(var pac in pacChegada)
@@ -654,6 +684,7 @@ namespace Escalonadores.Controllers
                                 escalonadorExecucao.fim = false;
                                 escalonadorExecucao.espera = false;
                                 escalonadorExecucao.momento = momento;
+                                eventos.Add(escalonadorExecucao);
                             }
 
                             else if(pac.emAtendimento && pac.duracao == 0)
@@ -668,7 +699,7 @@ namespace Escalonadores.Controllers
                                 pacAtendidos.Add(pac);
 
                                 nMedicosDisponiveis = nMedicosDisponiveis + 1;
-
+                                pacientesAtendidos = pacientesAtendidos + 1;
                                 EscalonadorExecucao escalonadorExecucao = new EscalonadorExecucao();
                                 escalonadorExecucao.idExecucao = pac.idExecucao;
                                 escalonadorExecucao.idPaciente = pac.idPaciente;
@@ -735,15 +766,15 @@ namespace Escalonadores.Controllers
 
                 long totalEspera = eventos.Where(x => x.espera).Count();
 
-                long cpuTotal = eventos.Where(x => x.inicio || x.fim || x.contador_medico != null).Count();
+                long cpuTotal = eventos.Where(x => (x.inicio || x.fim || x.contador_medico != null) && !x.espera).Select(x => x.momento).Distinct().Count();
+
+                long momentos = eventos.Select(x => x.momento).Distinct().Count();
 
                 long totalAtendimento = pacAtendidos.Select(x => x.duracaoTotal).ToList().Sum();
 
-                execucao.mediaEspera = totalExecucoes / totalEspera;
-
-                execucao.mediaExecucao = totalAtendimento / totalPacientes;
-
-                execucao.mediaCPU = cpuTotal / totalExecucoes;
+                execucao.mediaEspera = (totalEspera == 0) ? 0 : (double)totalExecucoes / totalEspera;
+                execucao.mediaExecucao = (totalExecucoes == 0) ? 0 : (double)totalAtendimento / totalExecucoes;
+                execucao.mediaCPU = (cpuTotal == 0) ? 0 : (double)momentos / cpuTotal;
 
                 _execucaoRepository.Update(execucao);
 

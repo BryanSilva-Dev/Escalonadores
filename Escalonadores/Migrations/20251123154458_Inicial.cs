@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escalonadores.Migrations
 {
     /// <inheritdoc />
-    public partial class migracao : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,10 +34,12 @@ namespace Escalonadores.Migrations
                     id_escalonador_execucao = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     id_execucao = table.Column<long>(type: "bigint", nullable: false),
-                    id_paciente = table.Column<long>(type: "bigint", nullable: false),
-                    contador_medico = table.Column<long>(type: "bigint", nullable: false),
-                    inicio = table.Column<long>(type: "bigint", nullable: false),
-                    fim = table.Column<long>(type: "bigint", nullable: false)
+                    id_paciente = table.Column<long>(type: "bigint", nullable: true),
+                    contador_medico = table.Column<long>(type: "bigint", nullable: true),
+                    inicio = table.Column<bool>(type: "boolean", nullable: false),
+                    fim = table.Column<bool>(type: "boolean", nullable: false),
+                    espera = table.Column<bool>(type: "boolean", nullable: false),
+                    momento = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,7 +74,9 @@ namespace Escalonadores.Migrations
                     id_execucao = table.Column<long>(type: "bigint", nullable: false),
                     tempo_chegada = table.Column<long>(type: "bigint", nullable: false),
                     tempo_saida = table.Column<long>(type: "bigint", nullable: false),
+                    tempo_espera = table.Column<long>(type: "bigint", nullable: false),
                     duracao = table.Column<long>(type: "bigint", nullable: false),
+                    duracao_total = table.Column<long>(type: "bigint", nullable: false),
                     id_prioridade_manchester = table.Column<long>(type: "bigint", nullable: false),
                     quantum = table.Column<long>(type: "bigint", nullable: true)
                 },

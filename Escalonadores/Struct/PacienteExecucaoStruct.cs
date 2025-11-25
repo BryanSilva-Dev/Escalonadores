@@ -39,5 +39,7 @@ namespace Escalonadores.Struct
         public long nAtendimentos { get; set; }
 
         public bool preemptado { get; set; }
+
+        public long? quantumOriginal { get; set; }
     }
 }
